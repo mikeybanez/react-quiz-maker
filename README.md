@@ -19,11 +19,11 @@ Because the app is fairly simple, there is no need to use some routing library a
 
 ## Components
 
-Form components such as the TextInput have been memoized, to anticipate larger datasets (such as long quizzes). Additionally, `useCallback()` is used liberally to cache callback functions for repeating components (for example, the `Remove this question` callback for individual `Question` components). While these cases may be automatically optimized by React Compiler, I have chosen not to opt into React Compiler just yet, as it is not officially considered production-ready.
-
-While there may be more components that have not been optimized (such as the navbar for the pages), I have chosen not to do so as these are very small components and are not at risk of becoming unscalable.
-
 Component styling is kept to a minimum of a few global CSS files, and some usage of inline styles.
+
+My file organization structure currently puts globally reusable components (such as `<TextInput>`) into `src/components`; however, components specific to a Page, even if repeatedly used in that page, should belong to `src/pages/SpecificPage`.
+
+Until such time as we detect performance issues by profiling the app, we do not prematurely need to optimize the app with `useCallback()` or memoization of components.
 
 ### ALL OF README BELOW WAS GENERATED FROM VITE'S INITIALIZATION
 

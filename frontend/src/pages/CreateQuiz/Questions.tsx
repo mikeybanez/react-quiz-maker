@@ -1,10 +1,15 @@
-import { useState } from "react";
 import type { QuestionObject } from "../../types/Questions";
 import Question from "./Question";
 
-function Questions() {
-  const [questions, setQuestions] = useState<QuestionObject[]>([]);
-
+function Questions({
+  questions,
+  setQuestions,
+}: {
+  questions: QuestionObject[];
+  setQuestions: (
+    val: (questions: QuestionObject[]) => QuestionObject[]
+  ) => void;
+}) {
   return (
     <>
       <h3>Questions</h3>
@@ -27,7 +32,11 @@ function Questions() {
             ...questions,
             {
               type: "multipleChoice",
-              questionData: { prompt: "", options: [], correctOptionIndex: -1 },
+              questionData: {
+                prompt: "",
+                options: ["", ""],
+                correctOptionIndex: 0,
+              },
             },
           ]);
         }}

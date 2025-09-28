@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { PageState } from "../../types/Pages";
+import type { QuestionObject } from "../../types/Questions";
 import TextInput from "../../components/TextInput";
 import Questions from "./Questions";
 
 function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
+  const [questions, setQuestions] = useState<QuestionObject[]>([]);
 
   return (
     <>
@@ -16,24 +18,25 @@ function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
         <h2>Quiz Builder</h2>
       </div>
       <div>
-        {/* TODO: move label and input into their own component; document best practice of htmlFor */}
         <form onSubmit={(e) => e.preventDefault()}>
           <TextInput
             name="quizTitle"
             label="Quiz Title"
             value={quizTitle}
-            setValue={setQuizTitle}
+            onChange={(e) => setQuizTitle(e.target.value)}
+            size={30}
           />
           <br />
           <TextInput
             name="quizDescription"
             label="Quiz Description"
             value={quizDescription}
-            setValue={setQuizDescription}
+            onChange={(e) => setQuizDescription(e.target.value)}
+            size={30}
           />
           <br />
           <hr />
-          <Questions />
+          <Questions questions={questions} setQuestions={setQuestions} />
           <hr />
           <button type="submit" onClick={/* TODO */ () => {}}>
             Save Quiz

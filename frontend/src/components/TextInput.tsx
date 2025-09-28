@@ -1,15 +1,15 @@
-import { memo } from "react";
-
-const TextInput = memo(function Input({
+function TextInput({
   name,
   label,
   value,
-  setValue,
+  onChange,
+  size = 20,
 }: {
   name: string;
   label?: string;
   value: string;
-  setValue: (val: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  size?: number;
 }) {
   return (
     <>
@@ -18,15 +18,14 @@ const TextInput = memo(function Input({
         <input
           type="text"
           style={{ marginLeft: "8px" }}
-          name={name}
+          id={name}
           value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
+          onChange={onChange}
+          size={size}
         />
       </label>
     </>
   );
-});
+}
 
 export default TextInput;
