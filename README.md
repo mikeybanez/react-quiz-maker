@@ -2,9 +2,28 @@
 
 ## Setup
 
-The basic scaffold of the repo was made using Vite's `TypeScript` configuration. No optional choices (React compiler, Vite rolldown) were enabled as these are still not officially production-ready.
+The basic scaffold of the repo was made using Vite's `TypeScript` configuration. No optional choices were enabled.
 
 - There is a `.node-version` file that specifies I'm using Node 22.20.0; this is used together with `fnm` for easy Node version switching when you `cd` into `frontend/`, but you can just directly install Node 22 on your machine without having to install a version switcher. (`fnm` also added the `packageManager` value as `npm@11.6.1`).
+
+To run the frontend, just do `npm run dev`.
+To test the production version of the frontend, first do `npm run build` and then `npm run preview`.
+
+## Code structure
+
+Because the app is fairly simple, there is no need to use some routing library at the moment. A single `useState()` in the top-level `App` should suffice, with `setPage()` callbacks passed down to individual pages as props.
+
+- pages should be defined in `src/pages`
+- reusable components should be in `src/components`
+- shared type definitions should be in `src/types`
+
+## Components
+
+Form components such as the TextInput have been memoized, to anticipate larger datasets (such as long quizzes). Additionally, `useCallback()` is used liberally to cache callback functions for repeating components (for example, the `Remove this question` callback for individual `Question` components). While these cases may be automatically optimized by React Compiler, I have chosen not to opt into React Compiler just yet, as it is not officially considered production-ready.
+
+While there may be more components that have not been optimized (such as the navbar for the pages), I have chosen not to do so as these are very small components and are not at risk of becoming unscalable.
+
+Component styling is kept to a minimum of a few global CSS files, and some usage of inline styles.
 
 ### ALL OF README BELOW WAS GENERATED FROM VITE'S INITIALIZATION
 

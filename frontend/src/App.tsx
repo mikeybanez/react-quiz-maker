@@ -2,8 +2,11 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+import CreateQuiz from "./pages/CreateQuiz";
+import Home from "./pages/Home";
+import type { PageState } from "./types/Pages";
 
-function App() {
+function OldApp() {
   const [count, setCount] = useState(0);
 
   return (
@@ -28,6 +31,17 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+    </>
+  );
+}
+
+function App() {
+  const [page, setPage] = useState("home" as PageState);
+
+  return (
+    <>
+      {page === "home" && <Home setPage={setPage} />}
+      {page === "createQuiz" && <CreateQuiz setPage={setPage} />}
     </>
   );
 }
