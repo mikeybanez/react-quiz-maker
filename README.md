@@ -9,9 +9,13 @@ The basic scaffold of the repo was made using Vite's `TypeScript` configuration.
 To run the frontend, just do `npm run dev`.
 To test the production version of the frontend, first do `npm run build` and then `npm run preview`.
 
+For making new commits in the future, I recommend setting up prettier on your IDE with default settings. For now, I am not committing my workspace `.vscode` settings (and this is ignored in `.gitignore`), but this can be an option for larger teams that need unified setups.
+
 ## Code structure
 
 Because the app is fairly simple, there is no need to use some routing library at the moment. A single `useState()` in the top-level `App` should suffice, with `setPage()` callbacks passed down to individual pages as props.
+
+A few notes:
 
 - pages should be defined in `src/pages`
 - reusable components should be in `src/components`
@@ -24,6 +28,18 @@ Component styling is kept to a minimum of a few global CSS files, and some usage
 My file organization structure currently puts globally reusable components (such as `<TextInput>`) into `src/components`; however, components specific to a Page, even if repeatedly used in that page, should belong to `src/pages/SpecificPage`.
 
 Until such time as we detect performance issues by profiling the app, we do not prematurely need to optimize the app with `useCallback()` or memoization of components.
+
+## External State (API)
+
+We're using Tanstack query to help handle external state. It's important to note that to promote reusability of the same query across the app, we're making our own custom hooks under `src/hooks` to minimize repetition of code and to ensure we're avoiding typos with the query key.
+
+## Further notes for potential future improvement
+
+Some features are not included in this repository as they are not explicitly mentioned in the specifications.
+
+- Quiz Builder currently does not support reordering of drafted questions.
+- Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab.
+- There is currently no way to update quizzes and questions that have already been submitted to the Quiz Builder, as this was not specified in the docs. However, the backend APIs appear to already support PATCH endpoints for these.
 
 ### ALL OF README BELOW WAS GENERATED FROM VITE'S INITIALIZATION
 

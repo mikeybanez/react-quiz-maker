@@ -1,10 +1,14 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
+import reactLogo from "./assets/react.svg";
 import CreateQuiz from "./pages/CreateQuiz";
 import Home from "./pages/Home";
+import TakeQuiz from "./pages/TakeQuiz";
 import type { PageState } from "./types/Pages";
+import viteLogo from "/vite.svg";
+
+const queryClient = new QueryClient();
 
 function OldApp() {
   const [count, setCount] = useState(0);
@@ -39,10 +43,11 @@ function App() {
   const [page, setPage] = useState("home" as PageState);
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       {page === "home" && <Home setPage={setPage} />}
       {page === "createQuiz" && <CreateQuiz setPage={setPage} />}
-    </>
+      {page === "takeQuiz" && <TakeQuiz setPage={setPage} />}
+    </QueryClientProvider>
   );
 }
 
