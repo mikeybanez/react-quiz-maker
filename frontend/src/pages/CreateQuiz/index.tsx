@@ -1,6 +1,7 @@
 import { useState } from "react";
 import TextInput from "../../components/TextInput";
 import useCreateQuizMutation from "../../hooks/useCreateQuizMutation";
+import useUpdateQuestionMutation from "../../hooks/useUpdateQuestionMutation";
 import useUpdateQuizMetadataMutation from "../../hooks/useUpdateQuizMetadata";
 import type { PageState } from "../../types/Pages";
 import type { QuestionSchema, QuizSchema } from "../../types/Schema";
@@ -13,6 +14,7 @@ function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
   const [done, setDone] = useState(false);
   const createQuizMutation = useCreateQuizMutation();
   const updateQuizMutation = useUpdateQuizMetadataMutation();
+  const updateQuestionMutation = useUpdateQuestionMutation();
 
   return (
     <>
@@ -60,8 +62,25 @@ function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
                           description: quizDescription,
                         },
                         {
-                          onSuccess: () => {
-                            setDone(true);
+                          onSuccess: async () => {
+                            const commitQuestions = Promise.all(
+                              questions.map(
+                                (q) =>
+                                  new Promise((resolve, reject) => {
+                                    updateQuestionMutation.mutate(q, {
+                                      onSuccess: () => {
+                                        resolve(true);
+                                      },
+                                      onError: () => {
+                                        reject(true);
+                                      },
+                                    });
+                                  })
+                              )
+                            );
+                            commitQuestions.then(() => {
+                              setDone(true);
+                            });
                           },
                         }
                       );

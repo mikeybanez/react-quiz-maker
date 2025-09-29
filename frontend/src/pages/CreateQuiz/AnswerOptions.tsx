@@ -1,20 +1,17 @@
 import TextInput from "../../components/TextInput";
+import type { McqQuestionSchema, QuestionSchema } from "../../types/Schema";
 
 // a list of options for a multiple choice question
 // Let's just go with index for correct answer, to avoid running into duplicate answers
 function AnswerOptions({
-  options,
-  setOptions,
-  questionId,
-  correctAnswer,
-  setCorrectAnswer,
+  question,
+  setQuestion,
 }: {
-  options: string[];
-  setOptions: (newOptions: string[]) => void;
-  questionId: number;
-  correctAnswer: number;
-  setCorrectAnswer: (answer: number) => void;
+  question: McqQuestionSchema;
+  setQuestion: (newData: QuestionSchema) => void;
 }) {
+  const { options, id: questionId } = question;
+  const correctAnswer = Number(question.correctAnswer);
   return (
     <div>
       <h4>Choices</h4>
@@ -30,13 +27,19 @@ function AnswerOptions({
                 onChange={(e) => {
                   const newOptions = [...options];
                   newOptions[i] = e.target.value;
-                  setOptions(newOptions);
+                  setQuestion({
+                    ...question,
+                    options: newOptions,
+                  });
                 }}
                 size={20}
               />
               <button
                 onClick={() => {
-                  setCorrectAnswer(i);
+                  setQuestion({
+                    ...question,
+                    correctAnswer: String(i),
+                  });
                 }}
                 disabled={correctAnswer === i}
               >
@@ -47,14 +50,19 @@ function AnswerOptions({
               <button
                 onClick={() => {
                   const newOptions = options.filter((_, index) => i !== index);
-                  let newCorrectIndex = correctAnswer;
+                  let newCorrectIndex: string;
                   if (i === correctAnswer) {
-                    newCorrectIndex = 0; // ensure there's always a correct answer
+                    newCorrectIndex = "0"; // ensure there's always a correct answer after removing an option
                   } else if (i < correctAnswer) {
-                    newCorrectIndex = correctAnswer - 1;
+                    newCorrectIndex = String(correctAnswer - 1);
+                  } else {
+                    newCorrectIndex = String(correctAnswer);
                   }
-                  setCorrectAnswer(newCorrectIndex);
-                  setOptions(newOptions);
+                  setQuestion({
+                    ...question,
+                    options: newOptions,
+                    correctAnswer: newCorrectIndex,
+                  });
                 }}
                 disabled={options.length <= 1}
               >
@@ -69,7 +77,10 @@ function AnswerOptions({
       <button
         style={{ marginLeft: "8px" }}
         onClick={() => {
-          setOptions([...options, ""]);
+          setQuestion({
+            ...question,
+            options: [...options, ""],
+          });
         }}
       >
         Add Option

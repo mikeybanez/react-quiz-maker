@@ -1,4 +1,3 @@
-import { useState } from "react";
 import TextInput from "../../components/TextInput";
 import TransitionButton from "../../components/TransitionButton";
 import useRemoveQuestionMutation from "../../hooks/useRemoveQuestionMutation";
@@ -7,23 +6,17 @@ import type { QuestionSchema, ShortQuestionSchema } from "../../types/Schema";
 
 function ShortAnswerQuestionDraft({
   question,
-  modifyQuestion,
+  setQuestion,
   removeQuestion,
 }: {
   question: ShortQuestionSchema;
-  modifyQuestion: (newData: QuestionSchema) => void;
+  setQuestion: (newData: QuestionSchema) => void;
   removeQuestion: (questionId: number) => void;
 }) {
-  const [tempPrompt, setTempPrompt] = useState(question.prompt);
-  const [tempAnswer, setTempAnswer] = useState(question.correctAnswer ?? "");
   const updateMutation = useUpdateQuestionMutation();
   const removeMutation = useRemoveQuestionMutation();
   const handleSave = () => {
-    modifyQuestion({
-      ...question,
-      prompt: tempPrompt,
-      correctAnswer: tempAnswer,
-    });
+    updateMutation.mutate(question);
   };
   const handleRemove = () => {
     removeQuestion(question.id);
@@ -34,9 +27,12 @@ function ShortAnswerQuestionDraft({
       <TextInput
         name={`q${question.id}Prompt`}
         label="Prompt"
-        value={tempPrompt}
+        value={question.prompt}
         onChange={(e) => {
-          setTempPrompt(e.target.value);
+          setQuestion({
+            ...question,
+            prompt: e.target.value,
+          });
         }}
         size={40}
       />
@@ -44,9 +40,12 @@ function ShortAnswerQuestionDraft({
       <TextInput
         name={`q${question.id}Answer`}
         label="Answer"
-        value={tempAnswer}
+        value={question.correctAnswer ?? ""}
         onChange={(e) => {
-          setTempAnswer(e.target.value);
+          setQuestion({
+            ...question,
+            correctAnswer: e.target.value,
+          });
         }}
         size={40}
       />

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import TextInput from "../../components/TextInput";
 import TransitionButton from "../../components/TransitionButton";
 import useRemoveQuestionMutation from "../../hooks/useRemoveQuestionMutation";
@@ -8,34 +7,17 @@ import AnswerOptions from "./AnswerOptions";
 
 function MultipleChoiceQuestionDraft({
   question,
-  modifyQuestion,
+  setQuestion,
   removeQuestion,
 }: {
   question: McqQuestionSchema;
-  modifyQuestion: (newData: QuestionSchema) => void;
+  setQuestion: (newData: QuestionSchema) => void;
   removeQuestion: (questionId: number) => void;
 }) {
-  const [tempPrompt, setTempPrompt] = useState(question.prompt);
-  const [tempOptions, setTempOptions] = useState(question.options);
-  const [tempAnswer, setTempAnswer] = useState<number>(
-    Number(question.correctAnswer)
-  );
   const updateMutation = useUpdateQuestionMutation();
   const removeMutation = useRemoveQuestionMutation();
   const handleSave = () => {
-    updateMutation.mutate(
-      {
-        ...question,
-        prompt: tempPrompt,
-        options: tempOptions,
-        correctAnswer: String(tempAnswer),
-      },
-      {
-        onSuccess: (data) => {
-          modifyQuestion(data);
-        },
-      }
-    );
+    updateMutation.mutate(question);
   };
   const handleRemove = () => {
     removeQuestion(question.id);
@@ -45,19 +27,16 @@ function MultipleChoiceQuestionDraft({
       <TextInput
         name={`q${question.id}Prompt`}
         label="Prompt"
-        value={tempPrompt}
+        value={question.prompt}
         onChange={(e) => {
-          setTempPrompt(e.target.value);
+          setQuestion({
+            ...question,
+            prompt: e.target.value,
+          });
         }}
         size={40}
       />
-      <AnswerOptions
-        options={tempOptions}
-        setOptions={setTempOptions}
-        questionId={question.id}
-        correctAnswer={tempAnswer}
-        setCorrectAnswer={setTempAnswer}
-      />
+      <AnswerOptions question={question} setQuestion={setQuestion} />
       <TransitionButton
         onClick={handleSave}
         style={{ fontSize: "small" }}

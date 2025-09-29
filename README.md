@@ -27,11 +27,13 @@ Component styling is kept to a minimum of a few global CSS files, and some usage
 
 My file organization structure currently puts globally reusable components (such as `<TextInput>`) into `src/components`; however, components specific to a Page, even if repeatedly used in that page, should belong to `src/pages/SpecificPage`.
 
+`<TransitionButton>` is specifically created to show (at least in code) some way of handling loading and error states, as required in the specifications --- even if this is not easily visible when using locally hosted backend. I'm sure artificially slowing down responses will help with this.
+
 Until such time as we detect performance issues by profiling the app, we do not prematurely need to optimize the app with `useCallback()` or memoization of components.
 
 ## External State (API)
 
-We're using Tanstack query to help handle external state. It's important to note that to promote reusability of the same query across the app, we're making our own custom hooks under `src/hooks` to minimize repetition of code and to ensure we're avoiding typos with the query key.
+We're using Tanstack query to help handle external state. It's important to note that to promote reusability of the same query across the app, we're making our own custom hooks under `src/hooks` to minimize repetition of code and to ensure we're avoiding typos with the query key, or paths, etc.
 
 Given the shape of the backend API, the frontend mimics these routes and tries to aim for a good balancing act between persisting the user's partial work vs. limiting the number of network requests. For example, once a new question is added to the current quiz in Quiz Builder, a new question is immediately created through `POST /quizzes/:id/questions`. Similarly, when a question is deleted, the `DELETE` call is immediately invoked. However, we do not keep updating (through `PATCH /questions/:id`) every time the user makes a small change, such as changing the prompt or the correct answer. The user can press the [`Save Changes to Question`] button to save partial work.
 
@@ -41,88 +43,12 @@ Some features are not included in this repository as they are not explicitly men
 
 ### Quiz Builder notes
 
-- Quiz Builder currently does not support reordering of drafted questions.
-- Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab.
-- During quiz creation, there is currently no way to incrementally build the quiz question by question, as this was not specified in the docs, so quiz makers will need to create the quiz in one go for now. However, the backend APIs appear to already support PATCH endpoints for these.
+- Quiz Builder currently does not support reordering of drafted questions even though `position` update is possible to do in backend.
+- Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab. For now, however, they will need to either commit each question, or commit the entire quiz and end the quiz building process.
 - All newly created quizzes will be simply marked as `isPublished: true` for now, as the specs do not mention publishing (or unpublishing) of quizzes.
+- When persisting the entire quiz, right now the app applies a `PATCH` for all existing question drafts. However, a future improvement could be to do this more smartly, as larger datasets will incur a lot of parallel requests. My best idea is some implementation of a dirty bit (mark it true for any question during modification of any data, and mark it false after mutation success). This way, we only need to PATCH the "unsaved" questions.
 
 ### Quiz Player notes
 
-- On the flipside, I've taken care to implement partial answer submissions when _taking_ quizzes through Quiz Player, because the intention is for users to only get one attempt. They should be able to get partial scores this way.
-- NOTE: The specifications mention that users should be able to "answer questions with navigation between them" so I implemented the Quiz Player such that users would need to submit answers each time. If they navigate without submitting, the app would not submit their answer behind the scenes. The `End Quiz` button also does not submit all unsubmitted answers as the user is expected to manually submit after answering each question. With further improvement (lifting state up), I can modify this to maintain all answers in local memory, and perform `POST` calls to resubmit once the `End Quiz` button is pressed, or the time runs out.
-
-### ALL OF README BELOW WAS GENERATED FROM VITE'S INITIALIZATION
-
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+- The specifications mention that users should be able to "answer questions with navigation between them" so I implemented the Quiz Player such that users would need to submit answers each time. If they navigate without submitting, the app would not submit their answer behind the scenes. The `End Quiz` button also does not submit all unsubmitted answers as the user is expected to manually submit after answering each question. With further improvement (lifting state up), I can modify this to maintain all answers in local memory, and perform `POST` calls to resubmit once the `End Quiz` button is pressed, or the time runs out.
+- Quiz timeout auto-submit is not yet implemented.

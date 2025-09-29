@@ -1,5 +1,4 @@
 import useRemoveQuestionMutation from "../../hooks/useRemoveQuestionMutation";
-import useUpdateQuestionMutation from "../../hooks/useUpdateQuestionMutation";
 import type {
   CodeQuestionSchema,
   McqQuestionSchema,
@@ -19,7 +18,6 @@ function Question({
     val: (questions: QuestionSchema[]) => QuestionSchema[]
   ) => void;
 }) {
-  const updateQuestionMutation = useUpdateQuestionMutation();
   const removeQuestionMutation = useRemoveQuestionMutation();
 
   const removeQuestion = () => {
@@ -30,14 +28,10 @@ function Question({
     });
   };
 
-  const modifyQuestion = (newQuestion: QuestionSchema) => {
-    updateQuestionMutation.mutate(newQuestion, {
-      onSuccess: (data) => {
-        setQuestions((questions) =>
-          questions.map((q) => (q.id === data.id ? newQuestion : q))
-        );
-      },
-    });
+  const setQuestion = (newQuestion: QuestionSchema) => {
+    setQuestions((questions) =>
+      questions.map((q) => (q.id === data.id ? newQuestion : q))
+    );
   };
 
   return (
@@ -47,21 +41,21 @@ function Question({
         {data.type === "mcq" && (
           <MultipleChoiceQuestionDraft
             question={data as McqQuestionSchema}
-            modifyQuestion={modifyQuestion}
+            setQuestion={setQuestion}
             removeQuestion={removeQuestion}
           />
         )}
         {data.type === "short" && (
           <ShortAnswerQuestionDraft
             question={data as ShortQuestionSchema}
-            modifyQuestion={modifyQuestion}
+            setQuestion={setQuestion}
             removeQuestion={removeQuestion}
           />
         )}
         {data.type === "code" && (
           <CodeQuestionDraft
             question={data as CodeQuestionSchema}
-            modifyQuestion={modifyQuestion}
+            setQuestion={setQuestion}
             removeQuestion={removeQuestion}
           />
         )}
