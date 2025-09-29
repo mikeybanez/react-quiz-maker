@@ -33,6 +33,8 @@ Until such time as we detect performance issues by profiling the app, we do not 
 
 We're using Tanstack query to help handle external state. It's important to note that to promote reusability of the same query across the app, we're making our own custom hooks under `src/hooks` to minimize repetition of code and to ensure we're avoiding typos with the query key.
 
+Given the shape of the backend API, the frontend mimics these routes and tries to aim for a good balancing act between persisting the user's partial work vs. limiting the number of network requests. For example, once a new question is added to the current quiz in Quiz Builder, a new question is immediately created through `POST /quizzes/:id/questions`. Similarly, when a question is deleted, the `DELETE` call is immediately invoked. However, we do not keep updating (through `PATCH /questions/:id`) every time the user makes a small change, such as changing the prompt or the correct answer. The user can press the [`Save Changes to Question`] button to save partial work.
+
 ## Further notes for potential future improvement
 
 Some features are not included in this repository as they are not explicitly mentioned in the specifications.
@@ -42,7 +44,7 @@ Some features are not included in this repository as they are not explicitly men
 - Quiz Builder currently does not support reordering of drafted questions.
 - Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab.
 - During quiz creation, there is currently no way to incrementally build the quiz question by question, as this was not specified in the docs, so quiz makers will need to create the quiz in one go for now. However, the backend APIs appear to already support PATCH endpoints for these.
-- All newly created quizze will be simply marked as `isPublished: true` for now, as the specs do not mention publishing (or unpublishing) of quizzes.
+- All newly created quizzes will be simply marked as `isPublished: true` for now, as the specs do not mention publishing (or unpublishing) of quizzes.
 
 ### Quiz Player notes
 

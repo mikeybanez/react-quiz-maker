@@ -16,10 +16,26 @@ function MultipleChoiceQuestionDraft({
   removeQuestion: (questionId: number) => void;
 }) {
   const [tempPrompt, setTempPrompt] = useState(question.prompt);
+  const [tempOptions, setTempOptions] = useState(question.options);
+  const [tempAnswer, setTempAnswer] = useState<number>(
+    Number(question.correctAnswer)
+  );
   const updateMutation = useUpdateQuestionMutation();
   const removeMutation = useRemoveQuestionMutation();
   const handleSave = () => {
-    // TODO
+    updateMutation.mutate(
+      {
+        ...question,
+        prompt: tempPrompt,
+        options: tempOptions,
+        correctAnswer: String(tempAnswer),
+      },
+      {
+        onSuccess: (data) => {
+          modifyQuestion(data);
+        },
+      }
+    );
   };
   const handleRemove = () => {
     removeQuestion(question.id);
@@ -35,7 +51,13 @@ function MultipleChoiceQuestionDraft({
         }}
         size={40}
       />
-      <AnswerOptions question={question} modifyQuestion={modifyQuestion} />
+      <AnswerOptions
+        options={tempOptions}
+        setOptions={setTempOptions}
+        questionId={question.id}
+        correctAnswer={tempAnswer}
+        setCorrectAnswer={setTempAnswer}
+      />
       <TransitionButton
         onClick={handleSave}
         style={{ fontSize: "small" }}
@@ -44,7 +66,7 @@ function MultipleChoiceQuestionDraft({
         isError={updateMutation.isError}
         isSuccess={updateMutation.isSuccess}
       >
-        Save Question
+        Save Changes to Question
       </TransitionButton>
       <TransitionButton
         onClick={handleRemove}

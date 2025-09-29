@@ -39,6 +39,7 @@ function CodeQuestionDraft({
         }}
         size={40}
       />
+      <br />
       <TransitionButton
         onClick={handleSave}
         style={{ fontSize: "small" }}
@@ -47,7 +48,7 @@ function CodeQuestionDraft({
         isError={updateMutation.isError}
         isSuccess={updateMutation.isSuccess}
       >
-        Save Question
+        Save Changes to Question
       </TransitionButton>
       <TransitionButton
         onClick={handleRemove}

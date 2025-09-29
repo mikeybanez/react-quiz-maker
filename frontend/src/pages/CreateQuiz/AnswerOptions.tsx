@@ -1,73 +1,62 @@
 import TextInput from "../../components/TextInput";
-import type { McqQuestionSchema, QuestionSchema } from "../../types/Schema";
 
 // a list of options for a multiple choice question
 // Let's just go with index for correct answer, to avoid running into duplicate answers
 function AnswerOptions({
-  question,
-  modifyQuestion,
+  options,
+  setOptions,
+  questionId,
+  correctAnswer,
+  setCorrectAnswer,
 }: {
-  question: McqQuestionSchema;
-  modifyQuestion: (newData: QuestionSchema) => void;
+  options: string[];
+  setOptions: (newOptions: string[]) => void;
+  questionId: number;
+  correctAnswer: number;
+  setCorrectAnswer: (answer: number) => void;
 }) {
   return (
     <div>
       <h4>Choices</h4>
       <br />
       <div>
-        {question.options.map((option, i) => {
+        {options.map((option, i) => {
           return (
-            <div key={`q${question.id}o${i}`}>
+            <div key={`q${questionId}o${i}`}>
               <TextInput
-                name={`q${question.id}o${i}`}
+                name={`q${questionId}o${i}`}
                 label={`Option ${i + 1}`}
                 value={option}
                 onChange={(e) => {
-                  const newOptions = [...question.options];
+                  const newOptions = [...options];
                   newOptions[i] = e.target.value;
-                  modifyQuestion({
-                    ...question,
-                    options: question.options.map((opt, j) => {
-                      if (i !== j) return opt;
-                      return e.target.value;
-                    }),
-                  });
+                  setOptions(newOptions);
                 }}
                 size={20}
               />
               <button
                 onClick={() => {
-                  modifyQuestion({
-                    ...question,
-                    correctAnswer: String(i),
-                  });
+                  setCorrectAnswer(i);
                 }}
-                disabled={question.correctAnswer === String(i)}
+                disabled={correctAnswer === i}
               >
-                {question.correctAnswer === String(i)
+                {correctAnswer === i
                   ? "✔️ Mark as correct answer"
                   : "❌ Mark as correct answer"}
               </button>
               <button
                 onClick={() => {
-                  const newOptions = question.options.filter(
-                    (_, index) => i !== index
-                  );
-                  let newCorrectIndex = question.correctAnswer;
-                  if (i === Number(question.correctAnswer)) {
-                    newCorrectIndex = String(0); // ensure there's always a correct answer
-                  } else if (i < Number(question.correctAnswer)) {
-                    newCorrectIndex = String(
-                      Number(question.correctAnswer) - 1
-                    );
+                  const newOptions = options.filter((_, index) => i !== index);
+                  let newCorrectIndex = correctAnswer;
+                  if (i === correctAnswer) {
+                    newCorrectIndex = 0; // ensure there's always a correct answer
+                  } else if (i < correctAnswer) {
+                    newCorrectIndex = correctAnswer - 1;
                   }
-                  modifyQuestion({
-                    ...question,
-                    options: newOptions,
-                    correctAnswer: newCorrectIndex,
-                  });
+                  setCorrectAnswer(newCorrectIndex);
+                  setOptions(newOptions);
                 }}
-                disabled={question.options.length <= 1}
+                disabled={options.length <= 1}
               >
                 Remove
               </button>
@@ -80,20 +69,12 @@ function AnswerOptions({
       <button
         style={{ marginLeft: "8px" }}
         onClick={() => {
-          const newOptions = [...question.options, ""];
-          modifyQuestion({
-            type: "multipleChoice",
-            questionData: {
-              ...question,
-              options: newOptions,
-            },
-          });
+          setOptions([...options, ""]);
         }}
       >
         Add Option
       </button>
       <hr />
-      <br />
     </div>
   );
 }

@@ -50,6 +50,7 @@ function ShortAnswerQuestionDraft({
         }}
         size={40}
       />
+      <br />
       <TransitionButton
         onClick={handleSave}
         style={{ fontSize: "small" }}
@@ -58,7 +59,7 @@ function ShortAnswerQuestionDraft({
         isError={updateMutation.isError}
         isSuccess={updateMutation.isSuccess}
       >
-        Save Question
+        Save Changes to Question
       </TransitionButton>
       <TransitionButton
         onClick={handleRemove}

@@ -13,18 +13,20 @@ function ScoreBoard({
       <br />
       <div>
         <table>
-          {(endQuizData as GradedResult).details.map((question, index) => {
-            return (
-              <tr key={question.questionId}>
-                <td>{`${index + 1}`}</td>
-                <td>{question.correct ? "✅" : "❌"}</td>
-                <td>
-                  {question.expected !== undefined &&
-                    ` Expected result: ${question.expected}`}
-                </td>
-              </tr>
-            );
-          })}
+          <tbody>
+            {(endQuizData as GradedResult).details.map((question, index) => {
+              return (
+                <tr key={question.questionId}>
+                  <td>{`${index + 1}`}</td>
+                  <td>{question.correct ? "✅" : "❌"}</td>
+                  <td>
+                    {question.expected !== undefined &&
+                      ` Expected result: ${question.expected}`}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </div>
     </div>
