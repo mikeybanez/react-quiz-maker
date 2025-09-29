@@ -1,16 +1,20 @@
-import { useState } from "react";
 import type { QuestionSchema } from "../../types/Schema";
 
 import useAttemptAnswerMutation from "../../hooks/useAttemptAnswerMutation";
 
 function CodeRenderer({
+  answers,
+  setAnswers,
   question,
   attemptId,
+  currentQuestion,
 }: {
+  answers: string[];
+  setAnswers: (newAnswers: string[]) => void;
   question: Omit<QuestionSchema, "correctAnswer">;
   attemptId: number;
+  currentQuestion: number;
 }) {
-  const [answer, setAnswer] = useState<string>("");
   const attemptAnswerMutation = useAttemptAnswerMutation();
   const { isPending, isError, data } = attemptAnswerMutation;
 
@@ -18,8 +22,14 @@ function CodeRenderer({
     <div>
       <p>{question.prompt}</p>
       <textarea
-        value={answer}
-        onChange={(e) => setAnswer(e.target.value)}
+        value={answers[currentQuestion]}
+        onChange={(e) =>
+          setAnswers(
+            answers.map((ans, i) =>
+              i === currentQuestion ? e.target.value : ans
+            )
+          )
+        }
         cols={60}
         rows={8}
       />
@@ -29,7 +39,7 @@ function CodeRenderer({
           attemptAnswerMutation.mutate({
             attemptId,
             questionId: question.id,
-            answer,
+            answer: answers[currentQuestion],
           });
         }}
         disabled={isPending}

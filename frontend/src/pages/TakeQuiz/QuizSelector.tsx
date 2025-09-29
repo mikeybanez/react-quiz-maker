@@ -8,8 +8,6 @@ function QuizSelector({
   setQuizId: (num: number) => void;
   handleStartAttempt: (quizId: number) => void;
 }) {
-  // TODO: correctly handle initial state
-
   // local state for controlled select component
   const [selectedQuiz, setSelectedQuiz] = useState<number | null>(null);
 

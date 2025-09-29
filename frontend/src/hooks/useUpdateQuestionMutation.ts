@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import type { QuestionSchema } from "../types/Schema";
 import { BACKEND_URL } from "../constants/Url";
 
-// TODO: need to handle transition/error/success states for every instance of saving question.
 function useUpdateQuestionMutation() {
   return useMutation({
     mutationFn: (question: QuestionSchema) => {

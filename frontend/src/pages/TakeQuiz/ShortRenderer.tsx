@@ -1,17 +1,21 @@
-import { useState } from "react";
 import type { QuestionSchema } from "../../types/Schema";
 
 import TextInput from "../../components/TextInput";
 import useAttemptAnswerMutation from "../../hooks/useAttemptAnswerMutation";
 
 function ShortRenderer({
+  answers,
+  setAnswers,
   question,
   attemptId,
+  currentQuestion,
 }: {
+  answers: string[];
+  setAnswers: (newAnswers: string[]) => void;
   question: Omit<QuestionSchema, "correctAnswer">;
   attemptId: number;
+  currentQuestion: number;
 }) {
-  const [answer, setAnswer] = useState<string>("");
   const attemptAnswerMutation = useAttemptAnswerMutation();
   const { isPending, isError, data } = attemptAnswerMutation;
 
@@ -21,8 +25,14 @@ function ShortRenderer({
       <TextInput
         name="shortAnswer"
         label="Answer"
-        value={answer}
-        onChange={(e) => setAnswer(e.target.value)}
+        value={answers[currentQuestion]}
+        onChange={(e) =>
+          setAnswers(
+            answers.map((ans, i) =>
+              i === currentQuestion ? e.target.value : ans
+            )
+          )
+        }
       />
       <br />
       <button
@@ -30,7 +40,7 @@ function ShortRenderer({
           attemptAnswerMutation.mutate({
             attemptId,
             questionId: question.id,
-            answer,
+            answer: answers[currentQuestion],
           });
         }}
         disabled={isPending}

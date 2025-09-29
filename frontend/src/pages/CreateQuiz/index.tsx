@@ -65,17 +65,8 @@ function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
                           onSuccess: async () => {
                             const commitQuestions = Promise.all(
                               questions.map(
-                                (q) =>
-                                  new Promise((resolve, reject) => {
-                                    updateQuestionMutation.mutate(q, {
-                                      onSuccess: () => {
-                                        resolve(true);
-                                      },
-                                      onError: () => {
-                                        reject(true);
-                                      },
-                                    });
-                                  })
+                                async (q) =>
+                                  await updateQuestionMutation.mutateAsync(q)
                               )
                             );
                             commitQuestions.then(() => {
