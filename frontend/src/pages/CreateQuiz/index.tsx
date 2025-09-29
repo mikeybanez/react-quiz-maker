@@ -2,7 +2,7 @@ import { useState } from "react";
 import TextInput from "../../components/TextInput";
 import useCreateQuizMutation from "../../hooks/useCreateQuizMutation";
 import type { PageState } from "../../types/Pages";
-import type { QuestionSchema } from "../../types/Schema";
+import type { QuestionSchema, QuizSchema } from "../../types/Schema";
 import Questions from "./Questions";
 
 function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
@@ -40,7 +40,11 @@ function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
           <hr />
           {createQuizMutation.data && (
             <>
-              <Questions questions={questions} setQuestions={setQuestions} />
+              <Questions
+                quizId={(createQuizMutation.data as QuizSchema).id}
+                questions={questions}
+                setQuestions={setQuestions}
+              />
               <hr />
               <button onClick={() => {}}>Save Quiz</button>
             </>

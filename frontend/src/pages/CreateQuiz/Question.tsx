@@ -1,3 +1,5 @@
+import useRemoveQuestionMutation from "../../hooks/useRemoveQuestionMutation";
+import useUpdateQuestionMutation from "../../hooks/useUpdateQuestionMutation";
 import type {
   CodeQuestionSchema,
   McqQuestionSchema,
@@ -17,14 +19,25 @@ function Question({
     val: (questions: QuestionSchema[]) => QuestionSchema[]
   ) => void;
 }) {
+  const updateQuestionMutation = useUpdateQuestionMutation();
+  const removeQuestionMutation = useRemoveQuestionMutation();
+
   const removeQuestion = () => {
-    setQuestions((questions) => questions.filter((q) => q.id !== data.id));
+    removeQuestionMutation.mutate(data.id, {
+      onSuccess: (data) => {
+        setQuestions((questions) => questions.filter((q) => q.id !== data.id));
+      },
+    });
   };
 
   const modifyQuestion = (newQuestion: QuestionSchema) => {
-    setQuestions((questions) =>
-      questions.map((q) => (q.id === data.id ? newQuestion : q))
-    );
+    updateQuestionMutation.mutate(newQuestion, {
+      onSuccess: (data) => {
+        setQuestions((questions) =>
+          questions.map((q) => (q.id === data.id ? newQuestion : q))
+        );
+      },
+    });
   };
 
   return (
@@ -35,24 +48,24 @@ function Question({
           <MultipleChoiceQuestionDraft
             question={data as McqQuestionSchema}
             modifyQuestion={modifyQuestion}
+            removeQuestion={removeQuestion}
           />
         )}
         {data.type === "short" && (
           <ShortAnswerQuestionDraft
             question={data as ShortQuestionSchema}
             modifyQuestion={modifyQuestion}
+            removeQuestion={removeQuestion}
           />
         )}
         {data.type === "code" && (
           <CodeQuestionDraft
             question={data as CodeQuestionSchema}
             modifyQuestion={modifyQuestion}
+            removeQuestion={removeQuestion}
           />
         )}
       </div>
-      <button onClick={removeQuestion} style={{ fontSize: "small" }}>
-        Remove Question
-      </button>
     </div>
   );
 }

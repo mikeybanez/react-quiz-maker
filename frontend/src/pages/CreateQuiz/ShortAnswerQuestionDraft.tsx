@@ -1,24 +1,37 @@
+import { useState } from "react";
 import TextInput from "../../components/TextInput";
 import type { QuestionSchema, ShortQuestionSchema } from "../../types/Schema";
 
 function ShortAnswerQuestionDraft({
   question,
   modifyQuestion,
+  removeQuestion,
 }: {
   question: ShortQuestionSchema;
   modifyQuestion: (newData: QuestionSchema) => void;
+  removeQuestion: (questionId: number) => void;
 }) {
+  const [tempPrompt, setTempPrompt] = useState(question.prompt);
+  const [tempAnswer, setTempAnswer] = useState(question.correctAnswer ?? "");
+  const handleSave = () => {
+    modifyQuestion({
+      ...question,
+      prompt: tempPrompt,
+      correctAnswer: tempAnswer,
+    });
+  };
+  const handleRemove = () => {
+    removeQuestion(question.id);
+  };
+
   return (
     <>
       <TextInput
         name={`q${question.id}Prompt`}
         label="Prompt"
-        value={question.prompt}
+        value={tempPrompt}
         onChange={(e) => {
-          modifyQuestion({
-            ...question,
-            prompt: e.target.value,
-          });
+          setTempPrompt(e.target.value);
         }}
         size={40}
       />
@@ -26,15 +39,18 @@ function ShortAnswerQuestionDraft({
       <TextInput
         name={`q${question.id}Answer`}
         label="Answer"
-        value={question.correctAnswer ?? ""}
+        value={tempAnswer}
         onChange={(e) => {
-          modifyQuestion({
-            ...question,
-            correctAnswer: e.target.value,
-          });
+          setTempAnswer(e.target.value);
         }}
         size={40}
       />
+      <button onClick={handleSave} style={{ fontSize: "small" }}>
+        Save Question
+      </button>
+      <button onClick={handleRemove} style={{ fontSize: "small" }}>
+        Remove Question
+      </button>
     </>
   );
 }

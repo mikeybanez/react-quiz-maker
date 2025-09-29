@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type { NewQuestionSchema } from "../types/Schema";
 import { BACKEND_URL } from "../constants/Url";
 
-function useCreateQuizzesMutation() {
+function useCreateQuestionMutation() {
   return useMutation({
     mutationFn: ({ quizId, question} : { quizId: number, question: NewQuestionSchema}) => {
       return fetch(`${BACKEND_URL}/quizzes/${quizId}/questions`, {
@@ -22,4 +22,4 @@ function useCreateQuizzesMutation() {
   });
 }
 
-export default useCreateQuizzesMutation;
+export default useCreateQuestionMutation;
