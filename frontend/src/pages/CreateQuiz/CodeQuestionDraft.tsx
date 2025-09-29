@@ -1,12 +1,11 @@
 import TextInput from "../../components/TextInput";
-import type { McqQuestionSchema, QuestionSchema } from "../../types/Schema";
-import AnswerOptions from "./AnswerOptions";
+import type { CodeQuestionSchema, QuestionSchema } from "../../types/Schema";
 
-function MultipleChoiceQuestionDraft({
+function CodeQuestionDraft({
   question,
   modifyQuestion,
 }: {
-  question: McqQuestionSchema;
+  question: CodeQuestionSchema;
   modifyQuestion: (newData: QuestionSchema) => void;
 }) {
   return (
@@ -23,10 +22,8 @@ function MultipleChoiceQuestionDraft({
         }}
         size={40}
       />
-      <AnswerOptions question={question} modifyQuestion={modifyQuestion} />
-      <button>Save this question</button>
     </>
   );
 }
 
-export default MultipleChoiceQuestionDraft;
+export default CodeQuestionDraft;

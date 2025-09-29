@@ -1,41 +1,36 @@
 import TextInput from "../../components/TextInput";
-import type {
-  QuestionObject,
-  ShortAnswerQuestion,
-} from "../../types/Questions";
+import type { QuestionSchema, ShortQuestionSchema } from "../../types/Schema";
 
 function ShortAnswerQuestionDraft({
-  qNumber,
   question,
   modifyQuestion,
 }: {
-  qNumber: number;
-  question: ShortAnswerQuestion;
-  modifyQuestion: (newData: QuestionObject) => void;
+  question: ShortQuestionSchema;
+  modifyQuestion: (newData: QuestionSchema) => void;
 }) {
   return (
     <>
       <TextInput
-        name={`q${qNumber}Prompt`}
+        name={`q${question.id}Prompt`}
         label="Prompt"
         value={question.prompt}
         onChange={(e) => {
           modifyQuestion({
-            type: "shortAnswer",
-            questionData: { ...question, prompt: e.target.value },
+            ...question,
+            prompt: e.target.value,
           });
         }}
         size={40}
       />
       <br />
       <TextInput
-        name={`q${qNumber}Answer`}
+        name={`q${question.id}Answer`}
         label="Answer"
-        value={question.correctAnswer}
+        value={question.correctAnswer ?? ""}
         onChange={(e) => {
           modifyQuestion({
-            type: "shortAnswer",
-            questionData: { ...question, correctAnswer: e.target.value },
+            ...question,
+            correctAnswer: e.target.value,
           });
         }}
         size={40}

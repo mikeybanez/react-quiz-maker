@@ -1,51 +1,51 @@
 import type {
-  MultipleChoiceQuestion as MultipleChoiceQuestionType,
-  QuestionObject,
-  QuestionType,
-  ShortAnswerQuestion as ShortAnswerQuestionType,
-} from "../../types/Questions";
-import ShortAnswerQuestionDraft from "./ShortAnswerQuestionDraft";
+  CodeQuestionSchema,
+  McqQuestionSchema,
+  QuestionSchema,
+  ShortQuestionSchema,
+} from "../../types/Schema";
+import CodeQuestionDraft from "./CodeQuestionDraft";
 import MultipleChoiceQuestionDraft from "./MultipleChoiceQuestionDraft";
+import ShortAnswerQuestionDraft from "./ShortAnswerQuestionDraft";
 
 function Question({
-  qNumber,
-  type,
   data,
   setQuestions,
 }: {
-  qNumber: number;
-  type: QuestionType;
-  data: MultipleChoiceQuestionType | ShortAnswerQuestionType;
+  data: QuestionSchema;
   setQuestions: (
-    val: (questions: QuestionObject[]) => QuestionObject[]
+    val: (questions: QuestionSchema[]) => QuestionSchema[]
   ) => void;
 }) {
   const removeQuestion = () => {
-    setQuestions((questions) => questions.filter((_, i) => i !== qNumber));
+    setQuestions((questions) => questions.filter((q) => q.id !== data.id));
   };
 
-  const modifyQuestion = (newData: QuestionObject) => {
+  const modifyQuestion = (newQuestion: QuestionSchema) => {
     setQuestions((questions) =>
-      questions.map((q, i) => (i === qNumber ? newData : q))
+      questions.map((q) => (q.id === data.id ? newQuestion : q))
     );
   };
 
   return (
     <div style={{ border: "1px dashed black", margin: "8px", padding: "8px" }}>
-      Question {qNumber + 1}
       <br />
       <div>
-        {type === "multipleChoice" && (
+        {data.type === "mcq" && (
           <MultipleChoiceQuestionDraft
-            qNumber={qNumber}
-            question={data as MultipleChoiceQuestionType}
+            question={data as McqQuestionSchema}
             modifyQuestion={modifyQuestion}
           />
         )}
-        {type === "shortAnswer" && (
+        {data.type === "short" && (
           <ShortAnswerQuestionDraft
-            qNumber={qNumber}
-            question={data as ShortAnswerQuestionType}
+            question={data as ShortQuestionSchema}
+            modifyQuestion={modifyQuestion}
+          />
+        )}
+        {data.type === "code" && (
+          <CodeQuestionDraft
+            question={data as CodeQuestionSchema}
             modifyQuestion={modifyQuestion}
           />
         )}

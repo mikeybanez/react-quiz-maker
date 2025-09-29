@@ -22,6 +22,17 @@ export type QuestionSchema = {
   createdAt: string;
 };
 
+export type McqQuestionSchema = QuestionSchema & {
+  type: "mcq";
+  options: string[]; // assert that options are non-optional for client-side purposes
+};
+
+export type ShortQuestionSchema = QuestionSchema & { type: "short" };
+export type CodeQuestionSchema = QuestionSchema & { type: "code" };
+
+// POST /quizzes/:id/questions and PATCH /questions/:id
+export type NewQuestionSchema = Omit<QuestionSchema, "id" | "createdAt">;
+
 type SanitizedQuizSchema = Omit<QuestionSchema, "correctAnswer"> & {
   questions: QuestionSchema[];
 };
@@ -34,9 +45,7 @@ export type AttemptSchema = {
   submittedAt?: string;
   score?: number;
   // sanitized snapshot
-  quiz: Omit<QuestionSchema, "correctAnswer"> & {
-    questions: QuestionSchema[];
-  };
+  quiz: SanitizedQuizSchema;
 };
 
 // POST /attempts/:id/answer

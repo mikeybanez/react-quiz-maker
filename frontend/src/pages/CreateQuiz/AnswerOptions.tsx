@@ -1,18 +1,14 @@
-import type {
-  MultipleChoiceQuestion,
-  QuestionObject,
-} from "../../types/Questions";
 import TextInput from "../../components/TextInput";
+import type { McqQuestionSchema, QuestionSchema } from "../../types/Schema";
 
 // a list of options for a multiple choice question
+// Let's just go with index for correct answer, to avoid running into duplicate answers
 function AnswerOptions({
-  qNumber,
   question,
   modifyQuestion,
 }: {
-  qNumber: number;
-  question: MultipleChoiceQuestion;
-  modifyQuestion: (newData: QuestionObject) => void;
+  question: McqQuestionSchema;
+  modifyQuestion: (newData: QuestionSchema) => void;
 }) {
   return (
     <div>
@@ -21,20 +17,20 @@ function AnswerOptions({
       <div>
         {question.options.map((option, i) => {
           return (
-            <div key={`q${qNumber}o${i}`}>
+            <div key={`q${question.id}o${i}`}>
               <TextInput
-                name={`q${qNumber}o${i}`}
+                name={`q${question.id}o${i}`}
                 label={`Option ${i + 1}`}
                 value={option}
                 onChange={(e) => {
                   const newOptions = [...question.options];
                   newOptions[i] = e.target.value;
                   modifyQuestion({
-                    type: "multipleChoice",
-                    questionData: {
-                      ...question,
-                      options: newOptions,
-                    },
+                    ...question,
+                    options: question.options.map((opt, j) => {
+                      if (i !== j) return opt;
+                      return e.target.value;
+                    }),
                   });
                 }}
                 size={20}
@@ -42,16 +38,13 @@ function AnswerOptions({
               <button
                 onClick={() => {
                   modifyQuestion({
-                    type: "multipleChoice",
-                    questionData: {
-                      ...question,
-                      correctOptionIndex: i,
-                    },
+                    ...question,
+                    correctAnswer: String(i),
                   });
                 }}
-                disabled={question.correctOptionIndex === i}
+                disabled={question.correctAnswer === String(i)}
               >
-                {question.correctOptionIndex === i
+                {question.correctAnswer === String(i)
                   ? "✔️ Mark as correct answer"
                   : "❌ Mark as correct answer"}
               </button>
@@ -60,19 +53,18 @@ function AnswerOptions({
                   const newOptions = question.options.filter(
                     (_, index) => i !== index
                   );
-                  let newCorrectIndex = question.correctOptionIndex;
-                  if (i === question.correctOptionIndex) {
-                    newCorrectIndex = 0; // ensure there's always a correct answer
-                  } else if (i < question.correctOptionIndex) {
-                    newCorrectIndex -= 1;
+                  let newCorrectIndex = question.correctAnswer;
+                  if (i === Number(question.correctAnswer)) {
+                    newCorrectIndex = String(0); // ensure there's always a correct answer
+                  } else if (i < Number(question.correctAnswer)) {
+                    newCorrectIndex = String(
+                      Number(question.correctAnswer) - 1
+                    );
                   }
                   modifyQuestion({
-                    type: "multipleChoice",
-                    questionData: {
-                      ...question,
-                      options: newOptions,
-                      correctOptionIndex: newCorrectIndex,
-                    },
+                    ...question,
+                    options: newOptions,
+                    correctAnswer: newCorrectIndex,
                   });
                 }}
                 disabled={question.options.length <= 1}

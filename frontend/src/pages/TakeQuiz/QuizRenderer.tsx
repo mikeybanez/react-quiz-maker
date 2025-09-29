@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useAttemptMutation from "../../hooks/useAttemptMutation";
 import useEndQuizMutation from "../../hooks/useEndQuizMutation";
 import type { AttemptSchema } from "../../types/Schema";
@@ -14,8 +14,8 @@ function QuizRenderer({
   attempt: ReturnType<typeof useAttemptMutation>;
 }) {
   // note that currentQuestion here is 0-indexed, and does not
-  // correspond to `position`; instead, it corresponds to the index
-  // after we have sorted all questions by `position` data.
+  // correspond to `position`. But backend appears to already
+  // sort by position ASC so we should be fine
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   // let's use a `Date` object here, and only convert to string when submitting
   // so that we can easily compute elapsed time
@@ -26,14 +26,7 @@ function QuizRenderer({
   const endQuizMutation = useEndQuizMutation();
   const { data: endQuizData } = endQuizMutation;
 
-  // memoize to sort questions only once
-  const sortedQuestions = useMemo(() => {
-    if (!data) return null;
-
-    return (data as AttemptSchema).quiz.questions.sort(
-      (a, b) => a.position - b.position
-    );
-  }, [data]);
+  const questions = (data as AttemptSchema).quiz.questions;
 
   useEffect(() => {
     if (data) {
@@ -63,10 +56,10 @@ function QuizRenderer({
     <div>
       {/* TODO: ran-out-of-time view */}
       {/* TODO: isPending (loading) view */}
-      {sortedQuestions && sortedQuestions.length === 0 && (
+      {questions && questions.length === 0 && (
         <span>This quiz has no questions.</span>
       )}
-      {sortedQuestions && sortedQuestions.length && !endQuizData && (
+      {questions && questions.length && !endQuizData && (
         <>
           <h3>{data?.title}</h3>
           <p>{data?.description}</p>
@@ -74,7 +67,7 @@ function QuizRenderer({
           <h6>{`Time limit: ${data.quiz.timeLimitSeconds} seconds`}</h6>
           <QuizNavigation
             currentQuestion={currentQuestion}
-            numQuestions={sortedQuestions.length}
+            numQuestions={questions.length}
             setCurrentQuestion={setCurrentQuestion}
           />
           <div
@@ -92,24 +85,24 @@ function QuizRenderer({
             </span>
             <hr />
             <br />
-            {sortedQuestions[currentQuestion]?.type === "mcq" && (
+            {questions[currentQuestion]?.type === "mcq" && (
               <McqRenderer
-                question={sortedQuestions[currentQuestion]}
-                key={sortedQuestions[currentQuestion].id}
+                question={questions[currentQuestion]}
+                key={questions[currentQuestion].id}
                 attemptId={data.id}
               />
             )}
-            {sortedQuestions[currentQuestion]?.type === "short" && (
+            {questions[currentQuestion]?.type === "short" && (
               <ShortRenderer
-                question={sortedQuestions[currentQuestion]}
-                key={sortedQuestions[currentQuestion].id}
+                question={questions[currentQuestion]}
+                key={questions[currentQuestion].id}
                 attemptId={data.id}
               />
             )}
-            {sortedQuestions[currentQuestion]?.type === "code" && (
+            {questions[currentQuestion]?.type === "code" && (
               <CodeRenderer
-                question={sortedQuestions[currentQuestion]}
-                key={sortedQuestions[currentQuestion].id}
+                question={questions[currentQuestion]}
+                key={questions[currentQuestion].id}
                 attemptId={data.id}
               />
             )}
@@ -123,10 +116,10 @@ function QuizRenderer({
           </button>
         </>
       )}
-      {sortedQuestions && endQuizData && (
+      {questions && endQuizData && (
         <ScoreBoard
           endQuizData={endQuizData}
-          totalQuestions={sortedQuestions.length}
+          totalQuestions={questions.length}
         />
       )}
     </div>

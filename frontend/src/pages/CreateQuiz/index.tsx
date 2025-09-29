@@ -2,13 +2,13 @@ import { useState } from "react";
 import TextInput from "../../components/TextInput";
 import useCreateQuizMutation from "../../hooks/useCreateQuizMutation";
 import type { PageState } from "../../types/Pages";
-import type { QuestionObject } from "../../types/Questions";
+import type { QuestionSchema } from "../../types/Schema";
 import Questions from "./Questions";
 
 function CreateQuiz({ setPage }: { setPage: (page: PageState) => void }) {
   const [quizTitle, setQuizTitle] = useState("");
   const [quizDescription, setQuizDescription] = useState("");
-  const [questions, setQuestions] = useState<QuestionObject[]>([]);
+  const [questions, setQuestions] = useState<QuestionSchema[]>([]);
   const createQuizMutation = useCreateQuizMutation();
 
   return (
