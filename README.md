@@ -40,6 +40,7 @@ Some features are not included in this repository as they are not explicitly men
 - Quiz Builder currently does not support reordering of drafted questions.
 - Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab.
 - There is currently no way to update quizzes and questions that have already been submitted to the Quiz Builder, as this was not specified in the docs. However, the backend APIs appear to already support PATCH endpoints for these.
+- Quiz Player currently does not remember if you have submitted an answer for a question, when navigating between questions.
 
 ### ALL OF README BELOW WAS GENERATED FROM VITE'S INITIALIZATION
 

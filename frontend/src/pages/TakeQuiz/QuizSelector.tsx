@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import useQuizzesQuery from "../../hooks/useQuizzesQuery";
 import type { QuizSchema } from "../../types/Schema";
 
-function QuizSelector({ setQuizNum }: { setQuizNum: (num: number) => void }) {
+function QuizSelector({
+  handleStartAttempt,
+}: {
+  setQuizId: (num: number) => void;
+  handleStartAttempt: (quizId: number) => void;
+}) {
   // TODO: correctly handle initial state
+
+  // local state for controlled select component
   const [selectedQuiz, setSelectedQuiz] = useState<number | null>(null);
 
   const { isPending, isError, error, data } = useQuizzesQuery();
@@ -37,7 +44,7 @@ function QuizSelector({ setQuizNum }: { setQuizNum: (num: number) => void }) {
         disabled={selectedQuiz === null}
         onClick={() => {
           if (selectedQuiz !== null) {
-            setQuizNum(selectedQuiz);
+            handleStartAttempt(selectedQuiz);
           }
         }}
       >

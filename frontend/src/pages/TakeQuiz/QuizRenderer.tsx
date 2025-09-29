@@ -1,8 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
-import useQuestionsQuery from "../../hooks/useQuestionsQuery";
-import type { QuizSchema } from "../../types/Schema";
+import { useEffect, useMemo, useRef, useState } from "react";
+import useAttemptMutation from "../../hooks/useAttemptMutation";
+import type { AttemptSchema } from "../../types/Schema";
+import CodeRenderer from "./CodeRenderer";
+import McqRenderer from "./McqRenderer";
+import ShortRenderer from "./ShortRenderer";
 
-function QuizRenderer({ quiz }: { quiz: QuizSchema }) {
+function QuizRenderer({
+  attempt,
+}: {
+  attempt: ReturnType<typeof useAttemptMutation>;
+}) {
   // note that currentQuestion here is 0-indexed, and does not
   // correspond to `position`; instead, it corresponds to the index
   // after we have sorted all questions by `position` data.
@@ -10,14 +17,21 @@ function QuizRenderer({ quiz }: { quiz: QuizSchema }) {
   // let's use a `Date` object here, and only convert to string when submitting
   // so that we can easily compute elapsed time
   const [startedTime, setStartedTime] = useState<Date | null>(null);
-  const { isPending, isError, error, data } = useQuestionsQuery(quiz.id);
+  const { isPending, isError, error, data } = attempt;
+  const [isOutOfTime, setIsOutOfTime] = useState<boolean>(false);
+  const attemptTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // memoize to sort only once
   const sortedData = useMemo(() => {
     if (!data) return null;
     return {
       ...data,
-      questions: data.questions.sort((a, b) => a.position - b.position),
+      quiz: {
+        ...data.quiz,
+        questions: (data as AttemptSchema).quiz.questions.sort(
+          (a, b) => a.position - b.position
+        ),
+      },
     };
   }, [data]);
 
@@ -25,24 +39,36 @@ function QuizRenderer({ quiz }: { quiz: QuizSchema }) {
     if (data) {
       // now that data is available, we may then start the timer
       setStartedTime(new Date());
+      setIsOutOfTime(false);
+      if (data.timeLimitSeconds) {
+        attemptTimer.current = setTimeout(() => {
+          setIsOutOfTime(true);
+
+          // TODO: force submit the quiz
+        }, data.timeLimitSeconds * 1000);
+      }
     }
+
+    // don't forget the cleanup function, in case user
+    // wants to take multiple quizzes in one session
+    return () => {
+      clearTimeout(attemptTimer.current);
+    };
   }, [data]);
 
   if (isPending) return <div>Loading quiz...</div>;
   if (isError) return <div>{`Error loading quiz: ${error}`}</div>;
-  console.log(data);
-
-  // We cannot assume that the questions are sorted in the backend
-  // We memoize this so we don't perform sort on every render.
 
   return (
     <div>
-      <h3>{quiz.title}</h3>
-      <p>{quiz.description}</p>
+      {/* TODO: ran-out-of-time view */}
+      {/* TODO: isPending (loading) view */}
       {sortedData ? (
         <>
-          <h4>{`Quiz started at ${startedTime?.toLocaleString()}.`}</h4>
-          <h4>{`Time limit: ${quiz.timeLimitSeconds} seconds`}</h4>
+          <h3>{sortedData?.title}</h3>
+          <p>{sortedData?.description}</p>
+          <h6>{`Quiz started at ${startedTime?.toLocaleString()}.`}</h6>
+          <h6>{`Time limit: ${sortedData.quiz.timeLimitSeconds} seconds`}</h6>
           <nav>
             <button
               disabled={currentQuestion === 0}
@@ -56,7 +82,9 @@ function QuizRenderer({ quiz }: { quiz: QuizSchema }) {
               currentQuestion + 1
             }`}</span>
             <button
-              disabled={currentQuestion === sortedData.questions.length - 1}
+              disabled={
+                currentQuestion === sortedData.quiz.questions.length - 1
+              }
               onClick={() => {
                 setCurrentQuestion((q) => q + 1);
               }}
@@ -71,7 +99,24 @@ function QuizRenderer({ quiz }: { quiz: QuizSchema }) {
               border: "1px dashed black",
             }}
           >
-            <div>{sortedData.questions[currentQuestion]?.prompt}</div>
+            {sortedData.quiz.questions[currentQuestion]?.type === "mcq" && (
+              <McqRenderer
+                question={sortedData.quiz.questions[currentQuestion]}
+                key={sortedData.quiz.questions[currentQuestion].id}
+              />
+            )}
+            {sortedData.quiz.questions[currentQuestion]?.type === "short" && (
+              <ShortRenderer
+                question={sortedData.quiz.questions[currentQuestion]}
+                key={sortedData.quiz.questions[currentQuestion].id}
+              />
+            )}
+            {sortedData.quiz.questions[currentQuestion]?.type === "code" && (
+              <CodeRenderer
+                question={sortedData.quiz.questions[currentQuestion]}
+                key={sortedData.quiz.questions[currentQuestion].id}
+              />
+            )}
           </div>
         </>
       ) : (

@@ -1,14 +1,23 @@
-import { useState } from "react";
-import useQuizzesQuery from "../../hooks/useQuizzesQuery";
+import { useEffect, useState } from "react";
+import useAttemptMutation from "../../hooks/useAttemptMutation";
 import type { PageState } from "../../types/Pages";
-import type { QuizSchema } from "../../types/Schema";
 import QuizRenderer from "./QuizRenderer";
 import QuizSelector from "./QuizSelector";
 
 function TakeQuiz({ setPage }: { setPage: (page: PageState) => void }) {
-  const [quizNum, setQuizNum] = useState<number | null>(null);
-  const { data } = useQuizzesQuery();
-  const currentQuiz = data?.find((quiz: QuizSchema) => quiz.id === quizNum);
+  const [quizId, setQuizId] = useState<number | null>(null);
+  const mutation = useAttemptMutation();
+  const handleStartAttempt = (quizId: number) => {
+    mutation.mutate(quizId);
+  };
+
+  useEffect(() => {
+    // once we have successfully created an attempt, set the quizId to render the quiz
+    if (mutation.isSuccess && mutation.data) {
+      setQuizId(mutation.data.quizId);
+    }
+  }, [mutation.isSuccess, mutation.data]);
+
   return (
     <>
       <nav>
@@ -17,10 +26,13 @@ function TakeQuiz({ setPage }: { setPage: (page: PageState) => void }) {
       <div>
         <h2>Quiz Player</h2>
       </div>
-      {quizNum === null ? (
-        <QuizSelector setQuizNum={setQuizNum} />
+      {quizId === null ? (
+        <QuizSelector
+          setQuizId={setQuizId}
+          handleStartAttempt={handleStartAttempt}
+        />
       ) : (
-        <QuizRenderer quiz={currentQuiz} />
+        <QuizRenderer attempt={mutation} />
       )}
     </>
   );
