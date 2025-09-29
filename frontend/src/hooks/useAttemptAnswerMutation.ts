@@ -3,8 +3,8 @@ import { BACKEND_URL } from "../constants/Url";
 
 function useAttemptAnswerMutation() {
   return useMutation({
-    mutationFn: ({questionId, answer}: {questionId: number, answer: string}) => {
-      return fetch(`${BACKEND_URL}/attempts/${questionId}/answer`, {
+    mutationFn: ({attemptId, questionId, answer}: {attemptId: number, questionId: number, answer: string}) => {
+      return fetch(`${BACKEND_URL}/attempts/${attemptId}/answer`, {
         method: "POST",
         body: JSON.stringify({ questionId, value: answer }),
         headers: {

@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import useAttemptMutation from "../../hooks/useAttemptMutation";
+import useEndQuizMutation from "../../hooks/useEndQuizMutation";
 import type { AttemptSchema } from "../../types/Schema";
 import CodeRenderer from "./CodeRenderer";
 import McqRenderer from "./McqRenderer";
+import QuizNavigation from "./QuizNavigation";
+import ScoreBoard from "./ScoreBoard";
 import ShortRenderer from "./ShortRenderer";
 
 function QuizRenderer({
@@ -20,19 +23,16 @@ function QuizRenderer({
   const { isPending, isError, error, data } = attempt;
   const [isOutOfTime, setIsOutOfTime] = useState<boolean>(false);
   const attemptTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const endQuizMutation = useEndQuizMutation();
+  const { data: endQuizData } = endQuizMutation;
 
-  // memoize to sort only once
-  const sortedData = useMemo(() => {
+  // memoize to sort questions only once
+  const sortedQuestions = useMemo(() => {
     if (!data) return null;
-    return {
-      ...data,
-      quiz: {
-        ...data.quiz,
-        questions: (data as AttemptSchema).quiz.questions.sort(
-          (a, b) => a.position - b.position
-        ),
-      },
-    };
+
+    return (data as AttemptSchema).quiz.questions.sort(
+      (a, b) => a.position - b.position
+    );
   }, [data]);
 
   useEffect(() => {
@@ -63,35 +63,20 @@ function QuizRenderer({
     <div>
       {/* TODO: ran-out-of-time view */}
       {/* TODO: isPending (loading) view */}
-      {sortedData ? (
+      {sortedQuestions && sortedQuestions.length === 0 && (
+        <span>This quiz has no questions.</span>
+      )}
+      {sortedQuestions && sortedQuestions.length && !endQuizData && (
         <>
-          <h3>{sortedData?.title}</h3>
-          <p>{sortedData?.description}</p>
+          <h3>{data?.title}</h3>
+          <p>{data?.description}</p>
           <h6>{`Quiz started at ${startedTime?.toLocaleString()}.`}</h6>
-          <h6>{`Time limit: ${sortedData.quiz.timeLimitSeconds} seconds`}</h6>
-          <nav>
-            <button
-              disabled={currentQuestion === 0}
-              onClick={() => {
-                setCurrentQuestion((q) => q - 1);
-              }}
-            >
-              Previous Question
-            </button>
-            <span style={{ marginInline: "6px" }}>{`${
-              currentQuestion + 1
-            }`}</span>
-            <button
-              disabled={
-                currentQuestion === sortedData.quiz.questions.length - 1
-              }
-              onClick={() => {
-                setCurrentQuestion((q) => q + 1);
-              }}
-            >
-              Next Question
-            </button>
-          </nav>
+          <h6>{`Time limit: ${data.quiz.timeLimitSeconds} seconds`}</h6>
+          <QuizNavigation
+            currentQuestion={currentQuestion}
+            numQuestions={sortedQuestions.length}
+            setCurrentQuestion={setCurrentQuestion}
+          />
           <div
             style={{
               marginTop: "12px",
@@ -99,28 +84,50 @@ function QuizRenderer({
               border: "1px dashed black",
             }}
           >
-            {sortedData.quiz.questions[currentQuestion]?.type === "mcq" && (
+            <span>
+              <em>
+                Please make sure to Submit Answer every time you answer a
+                question.
+              </em>
+            </span>
+            <hr />
+            <br />
+            {sortedQuestions[currentQuestion]?.type === "mcq" && (
               <McqRenderer
-                question={sortedData.quiz.questions[currentQuestion]}
-                key={sortedData.quiz.questions[currentQuestion].id}
+                question={sortedQuestions[currentQuestion]}
+                key={sortedQuestions[currentQuestion].id}
+                attemptId={data.id}
               />
             )}
-            {sortedData.quiz.questions[currentQuestion]?.type === "short" && (
+            {sortedQuestions[currentQuestion]?.type === "short" && (
               <ShortRenderer
-                question={sortedData.quiz.questions[currentQuestion]}
-                key={sortedData.quiz.questions[currentQuestion].id}
+                question={sortedQuestions[currentQuestion]}
+                key={sortedQuestions[currentQuestion].id}
+                attemptId={data.id}
               />
             )}
-            {sortedData.quiz.questions[currentQuestion]?.type === "code" && (
+            {sortedQuestions[currentQuestion]?.type === "code" && (
               <CodeRenderer
-                question={sortedData.quiz.questions[currentQuestion]}
-                key={sortedData.quiz.questions[currentQuestion].id}
+                question={sortedQuestions[currentQuestion]}
+                key={sortedQuestions[currentQuestion].id}
+                attemptId={data.id}
               />
             )}
           </div>
+          <button
+            onClick={() => {
+              endQuizMutation.mutate(data.id);
+            }}
+          >
+            End quiz and get score
+          </button>
         </>
-      ) : (
-        <span>This quiz has no questions.</span>
+      )}
+      {sortedQuestions && endQuizData && (
+        <ScoreBoard
+          endQuizData={endQuizData}
+          totalQuestions={sortedQuestions.length}
+        />
       )}
     </div>
   );

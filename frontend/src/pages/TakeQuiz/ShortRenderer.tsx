@@ -6,8 +6,10 @@ import useAttemptAnswerMutation from "../../hooks/useAttemptAnswerMutation";
 
 function ShortRenderer({
   question,
+  attemptId,
 }: {
   question: Omit<QuestionSchema, "correctAnswer">;
+  attemptId: number;
 }) {
   const [answer, setAnswer] = useState<string>("");
   const attemptAnswerMutation = useAttemptAnswerMutation();
@@ -26,6 +28,7 @@ function ShortRenderer({
       <button
         onClick={() => {
           attemptAnswerMutation.mutate({
+            attemptId,
             questionId: question.id,
             answer,
           });

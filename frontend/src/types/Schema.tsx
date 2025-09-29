@@ -42,3 +42,12 @@ export type AttemptAnswerSchema = {
   questionId: number;
   value?: string;
 };
+
+export type GradedResult = {
+  score: number;
+  details: Array<{
+    questionId: number;
+    correct: boolean;
+    expected?: string;
+  }>;
+};

@@ -5,8 +5,10 @@ import useAttemptAnswerMutation from "../../hooks/useAttemptAnswerMutation";
 
 function McqRenderer({
   question,
+  attemptId,
 }: {
   question: Omit<QuestionSchema, "correctAnswer">;
+  attemptId: number;
 }) {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const attemptAnswerMutation = useAttemptAnswerMutation();
@@ -29,6 +31,7 @@ function McqRenderer({
       <button
         onClick={() => {
           attemptAnswerMutation.mutate({
+            attemptId,
             questionId: question.id,
             answer: selectedOption,
           });

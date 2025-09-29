@@ -5,8 +5,10 @@ import useAttemptAnswerMutation from "../../hooks/useAttemptAnswerMutation";
 
 function CodeRenderer({
   question,
+  attemptId,
 }: {
   question: Omit<QuestionSchema, "correctAnswer">;
+  attemptId: number;
 }) {
   const [answer, setAnswer] = useState<string>("");
   const attemptAnswerMutation = useAttemptAnswerMutation();
@@ -25,6 +27,7 @@ function CodeRenderer({
       <button
         onClick={() => {
           attemptAnswerMutation.mutate({
+            attemptId,
             questionId: question.id,
             answer,
           });

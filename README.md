@@ -37,10 +37,16 @@ We're using Tanstack query to help handle external state. It's important to note
 
 Some features are not included in this repository as they are not explicitly mentioned in the specifications.
 
+### Quiz Builder notes
+
 - Quiz Builder currently does not support reordering of drafted questions.
 - Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab.
-- There is currently no way to update quizzes and questions that have already been submitted to the Quiz Builder, as this was not specified in the docs. However, the backend APIs appear to already support PATCH endpoints for these.
-- Quiz Player currently does not remember if you have submitted an answer for a question, when navigating between questions.
+- During quiz creation, there is currently no way to incrementally build the quiz question by question, as this was not specified in the docs, so quiz makers will need to create the quiz in one go for now. However, the backend APIs appear to already support PATCH endpoints for these.
+
+### Quiz Player notes
+
+- On the flipside, I've taken care to implement partial answer submissions when _taking_ quizzes through Quiz Player, because the intention is for users to only get one attempt. They should be able to get partial scores this way.
+- NOTE: The specifications mention that users should be able to "answer questions with navigation between them" so I implemented the Quiz Player such that users would need to submit answers each time. If they navigate without submitting, the app would not submit their answer behind the scenes. The `End Quiz` button also does not submit all unsubmitted answers as the user is expected to manually submit after answering each question. With further improvement (lifting state up), I can modify this to maintain all answers in local memory, and perform `POST` calls to resubmit once the `End Quiz` button is pressed, or the time runs out.
 
 ### ALL OF README BELOW WAS GENERATED FROM VITE'S INITIALIZATION
 
