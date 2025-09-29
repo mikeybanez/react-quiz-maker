@@ -42,6 +42,7 @@ Some features are not included in this repository as they are not explicitly men
 - Quiz Builder currently does not support reordering of drafted questions.
 - Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab.
 - During quiz creation, there is currently no way to incrementally build the quiz question by question, as this was not specified in the docs, so quiz makers will need to create the quiz in one go for now. However, the backend APIs appear to already support PATCH endpoints for these.
+- All newly created quizze will be simply marked as `isPublished: true` for now, as the specs do not mention publishing (or unpublishing) of quizzes.
 
 ### Quiz Player notes
 

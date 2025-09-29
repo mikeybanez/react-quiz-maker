@@ -8,6 +8,9 @@ export type QuizSchema = {
   createdAt: string;
 };
 
+// POST /quizzes
+export type NewQuizSchema = Omit<QuizSchema, "id" | "createdAt">;
+
 export type QuestionSchema = {
   id: number; // questionId
   quizId: number;

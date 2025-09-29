@@ -7,8 +7,8 @@ function Home({ setPage }: { setPage: (page: PageState) => void }) {
         <h1>Quiz Maker</h1>
       </div>
       <div>
-        <button onClick={() => setPage("createQuiz")}>Create a quiz</button>
-        <button onClick={() => setPage("takeQuiz")}>Take a quiz</button>
+        <button onClick={() => setPage("createQuiz")}>Quiz Builder</button>
+        <button onClick={() => setPage("takeQuiz")}>Quiz Player</button>
       </div>
     </>
   );
