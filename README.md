@@ -6,6 +6,8 @@ The basic scaffold of the repo was made using Vite's `TypeScript` configuration.
 
 - There is a `.node-version` file that specifies I'm using Node 22.20.0; this is used together with `fnm` for easy Node version switching when you `cd` into `frontend/`, but you can just directly install Node 22 on your machine without having to install a version switcher. (`fnm` also added the `packageManager` value as `npm@11.6.1`).
 
+The `.env` file is committed to this repository as this is for demo purposes only.
+
 To run the frontend, just do `npm run dev`.
 To test the production version of the frontend, first do `npm run build` and then `npm run preview`.
 
@@ -25,7 +27,7 @@ A few notes:
 
 Component styling is kept to a minimum of a few global CSS files, and some usage of inline styles.
 
-My file organization structure currently puts globally reusable components (such as `<TextInput>`) into `src/components`; however, components specific to a Page, even if repeatedly used in that page, should belong to `src/pages/SpecificPage`.
+My file organization structure currently puts globally reusable components (such as `<TextInput>`) into `src/components`; however, components specific to a Page, even if repeatedly used in that page, should belong to `src/pages/SpecificPage`. I did not bother making wrapper components for rarely used elements in here such as `<select>`, as it's only used two times in the entire repo.
 
 `<TransitionButton>` is specifically created to show (at least in code) some way of handling loading and error states, as required in the specifications --- even if this is not easily visible when using locally hosted backend. I'm sure artificially slowing down responses will help with this.
 

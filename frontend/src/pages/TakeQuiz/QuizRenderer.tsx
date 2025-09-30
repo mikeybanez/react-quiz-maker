@@ -53,7 +53,6 @@ function QuizRenderer({
 
   return (
     <div>
-      {/* TODO: isPending (loading) view */}
       {questions && questions.length === 0 && (
         <span>This quiz has no questions.</span>
       )}

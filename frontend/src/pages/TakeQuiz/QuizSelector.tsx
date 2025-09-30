@@ -24,7 +24,6 @@ function QuizSelector({
 
   return (
     <>
-      {/** TODO: extract select into its component, with a label */}
       <select
         id="quizSelect"
         value={selectedQuiz !== null ? selectedQuiz : undefined}
