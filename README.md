@@ -46,10 +46,11 @@ Some features are not included in this repository as they are not explicitly men
 ### Quiz Builder notes
 
 - Quiz Builder currently does not support reordering of drafted questions even though `position` update is possible to do in backend.
-- Quiz Builder can potentially have locally saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab. For now, however, they will need to either commit each question, or commit the entire quiz and end the quiz building process.
+- Quiz Builder can potentially have browser-saved state (such as through `LocalStorage` or `IndexedDB`) to help users incrementally create large quizzes across several browser sessions, or to avoid losing work when accidentally closing the browser tab. For now, however, they will need to either commit each question, or commit the entire quiz and end the quiz building process.
 - All newly created quizzes will be simply marked as `isPublished: true` for now, as the specs do not mention publishing (or unpublishing) of quizzes.
 - When persisting the entire quiz, right now the app applies a `PATCH` for all existing question drafts. However, a future improvement could be to do this more smartly, as larger datasets will incur a lot of parallel requests. My best idea is some implementation of a dirty/stale bit (mark it true for any question during modification of any data, and mark it false after mutation success). This way, we only need to PATCH the "unsaved" questions.
 
 ### Quiz Player notes
 
 - Quiz timeout auto-submit is not yet implemented.
+- Anti-cheat bonus features are not yet implemented.
